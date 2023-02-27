@@ -8,6 +8,9 @@ from bluezero import async_tools
 from bluezero import adapter
 from bluezero import peripheral
 
+# from wrapper
+from robot import home
+import threading
 
 
 PI_SRV = '0000181c-0000-1000-8000-00805f9b34fb' # name of the service
@@ -18,6 +21,8 @@ def read_cmd(value, options):
     print("A command was sent")
     #msg = struct.unpack('<B', bytes(value))
     print(value)
+    new_thread = threading.Thread(target=home, name="robot_thread")
+    new_thread.start()
     pass
 
 def main(adapter_addr):
