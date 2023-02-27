@@ -4,8 +4,6 @@ from bluezero import adapter
 from bluezero import tools
 from bluezero import central
 
-
-
 def main():
     dongles = adapter.list_adapters()
     print('dongles available: ', dongles)

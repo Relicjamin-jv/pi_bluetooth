@@ -8,7 +8,11 @@ from bluezero import async_tools
 from bluezero import adapter
 from bluezero import peripheral
 
-
+#from wrapper
+import threading
+from Robot import home
+from Robot import leftRight
+from Robot import blowAir
 
 PI_SRV = '0000181c-0000-1000-8000-00805f9b34fb' # name of the service
 CMD_UUID = '00002a37-0000-1000-8000-00805f9b34fb' # name of the characteristic of that service, defined by bluetooth spec
