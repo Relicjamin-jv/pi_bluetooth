@@ -27,10 +27,13 @@ def read_cmd(value, options):
     print(f"Adding the robot command: {command}")
     cmd_queue.put_nowait(command)
     
-    
 
 def unwrap(input):
-    return [-10, 10, -10, 5, 4, 3]
+    decoded_value = input.decode('utf-8')
+    array = decoded_value.split(' ')
+    for i in range(0, len(array)):
+        array[i] = int(array[i])
+    return array
 
 def main(adapter_addr):
     """
@@ -60,7 +63,9 @@ def main(adapter_addr):
     
 
 if __name__ == '__main__':
-    print(list(adapter.Adapter.available())[0].address)
-    main(list(adapter.Adapter.available())[0].address)
+    #print(list(adapter.Adapter.available())[0].address)
+    #main(list(adapter.Adapter.available())[0].address)
+    print(unwrap(b"20 30 40 50 60 70"))
+
 
 
