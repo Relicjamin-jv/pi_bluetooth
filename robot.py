@@ -1,10 +1,26 @@
 import time
 from wlkata_mirobot import WlkataMirobot
 from time import sleep
+import queue
 
-
+# arm controls
 arm = WlkataMirobot(portname="/dev/ttyUSB0")
 arm.unlock_all_axis()
+
+# thread safe queue
+cmd_queue = queue.Queue(10)
+
+def add_command(command):
+    queue.put_nowait(command)
+
+def start_process():
+    while True:
+        if cmd_queue.empty() == False:
+            command = cmd_queue.get()
+            print(f"Working on command: {command}")
+            move(command[0], command[1], command[2], command[3], command[4], command[5])
+            print(f"Finished command: {command}")
+            cmd_queue.task_done() # releases the lock on the queue
 
 
 def home():

@@ -10,10 +10,7 @@ from bluezero import peripheral
 
 #from wrapper
 import threading
-from robot import home
-from robot import leftRight
-from robot import blowAir
-from robot import move
+from robot import start_process, add_command
 
 PI_SRV = '0000181c-0000-1000-8000-00805f9b34fb' # name of the service
 CMD_UUID = '00002a37-0000-1000-8000-00805f9b34fb' # name of the characteristic of that service, defined by bluetooth spec
@@ -22,8 +19,9 @@ CMD_UUID = '00002a37-0000-1000-8000-00805f9b34fb' # name of the characteristic o
 def read_cmd(value, options):
     print("A command was sent")
     command = unwrap(value)
-    print(f"Moving the robot {command}")
-    move(command[0], command[1], command[2], command[3], command[4], command[5])
+    print(f"Adding the robot command: {command}")
+    add_command(command)
+    
 
 def unwrap(input):
     return [-10, 10, -10, 5, 4, 3]
@@ -45,6 +43,10 @@ def main(adapter_addr):
     p_mon.add_characteristic(srv_id=1, chr_id=1, uuid=CMD_UUID, value=[], flags=['write'], write_callback=read_cmd, notify_callback=None, notifying=False) # this is from central perspective, we must write to the characteristic central
 
     p_mon.publish()
+
+    # starting the robot job queue
+    robot_thread = threading.Thread(target=start_process, name="robot")
+    robot_thread.start()
 
 
 if __name__ == '__main__':
