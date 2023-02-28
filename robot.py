@@ -5,6 +5,7 @@ from time import sleep
 
 
 def start_process(cmd_queue):
+    home()
     while True:
         if cmd_queue.empty() == False:
             print("Getting next command")

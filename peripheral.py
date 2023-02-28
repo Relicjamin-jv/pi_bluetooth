@@ -63,9 +63,9 @@ def main(adapter_addr):
     
 
 if __name__ == '__main__':
-    #print(list(adapter.Adapter.available())[0].address)
-    #main(list(adapter.Adapter.available())[0].address)
-    print(unwrap(b"20 30 40 50 60 70"))
+    print(list(adapter.Adapter.available())[0].address)
+    main(list(adapter.Adapter.available())[0].address)
+
 
 
 
