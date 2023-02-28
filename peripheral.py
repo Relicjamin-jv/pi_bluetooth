@@ -10,17 +10,23 @@ from bluezero import peripheral
 
 #from wrapper
 import threading
-from robot import start_process, add_command
+from robot import start_process
+
+import queue
 
 PI_SRV = '0000181c-0000-1000-8000-00805f9b34fb' # name of the service
 CMD_UUID = '00002a37-0000-1000-8000-00805f9b34fb' # name of the characteristic of that service, defined by bluetooth spec
+
+# thread safe queue
+cmd_queue = queue.Queue()
 
 # takes in a byte array
 def read_cmd(value, options):
     print("A command was sent")
     command = unwrap(value)
     print(f"Adding the robot command: {command}")
-    add_command(command)
+    cmd_queue.put_nowait(command)
+    
     
 
 def unwrap(input):
@@ -28,8 +34,15 @@ def unwrap(input):
 
 def main(adapter_addr):
     """
-    Advertising and start the peripheral
+    Advertising and start the peripheral, and starts the robot loop
     """
+
+    # starting the robot job queue
+    print("staring the robot thread")
+    robot_thread = threading.Thread(target=start_process, name="robot", args=(cmd_queue,))
+    robot_thread.start()
+
+
     logger = logging.getLogger('localGATT')
     logger.setLevel(logging.DEBUG)
 
@@ -44,10 +57,7 @@ def main(adapter_addr):
 
     p_mon.publish()
 
-    # starting the robot job queue
-    robot_thread = threading.Thread(target=start_process, name="robot")
-    robot_thread.start()
-
+    
 
 if __name__ == '__main__':
     print(list(adapter.Adapter.available())[0].address)

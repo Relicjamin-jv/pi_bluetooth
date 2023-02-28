@@ -1,21 +1,13 @@
 import time
 from wlkata_mirobot import WlkataMirobot
 from time import sleep
-import queue
 
-# arm controls
-arm = WlkataMirobot(portname="/dev/ttyUSB0")
-arm.unlock_all_axis()
 
-# thread safe queue
-cmd_queue = queue.Queue(10)
 
-def add_command(command):
-    queue.put_nowait(command)
-
-def start_process():
+def start_process(cmd_queue):
     while True:
         if cmd_queue.empty() == False:
+            print("Getting next command")
             command = cmd_queue.get()
             print(f"Working on command: {command}")
             move(command[0], command[1], command[2], command[3], command[4], command[5])
@@ -24,6 +16,9 @@ def start_process():
 
 
 def home():
+    # arm controls
+    arm = WlkataMirobot(portname="/dev/ttyUSB0")
+    arm.unlock_all_axis()
     print("Instantiate the Mirobot Arm instance")
     arm = WlkataMirobot()
     # Mirobot Arm Multi-axis executing
@@ -43,38 +38,15 @@ def home():
     print(f"instance status name after update: {arm.status.state}")
     pass
 
-def leftRight():
-    #arm.go_to_axis(30,0,0,0,0,0,1500)   #The first axis rotates from the zero position to the absolute position + 30 at 1500°/min
-    arm.go_to_axis(-20,0,0,0,0,0)   #The first axis rotates from the zero position to the absolute position -30 at 1500°/min
-    #arm.go_to_zero()   
-
-def blowAir():
-
-    # Air Pump Start - Suction
-    arm.pump_suction()
-    # Delay 5s
-    time.sleep(5)
-
-    # Air Pump Off
-    arm.pump_off()
-    # Delay 5s
-    time.sleep(2)
-
-    # Air Pump Start - Blowing
-    arm.pump_blowing()
-    # Delay 5s
-    time.sleep(5)
-
-    # Air Pump Off
-    arm.pump_off()
-    # Delay 5s
-    time.sleep(2)
-
 def move(x, y, z, a, b, c):
     '''
     Move the robot by a the defined contrains above
     '''
+    # arm controls
+    arm = WlkataMirobot(portname="/dev/ttyUSB0")
+    arm.unlock_all_axis()
     arm.go_to_axis(x, y, z, a, b, c)
+    print("Successfully moved the robot")
     
 
 
