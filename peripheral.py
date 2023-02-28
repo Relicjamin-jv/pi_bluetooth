@@ -10,9 +10,9 @@ from bluezero import peripheral
 
 #from wrapper
 import threading
-from Robot import home
-from Robot import leftRight
-from Robot import blowAir
+from robot import home
+from robot import leftRight
+from robot import blowAir
 
 PI_SRV = '0000181c-0000-1000-8000-00805f9b34fb' # name of the service
 CMD_UUID = '00002a37-0000-1000-8000-00805f9b34fb' # name of the characteristic of that service, defined by bluetooth spec
@@ -21,9 +21,15 @@ CMD_UUID = '00002a37-0000-1000-8000-00805f9b34fb' # name of the characteristic o
 def read_cmd(value, options):
     print("A command was sent")
     #msg = struct.unpack('<B', bytes(value))
-    print(value)
-    new_thread = threading.Thread(target=home, name="robot_thread")
-    new_thread.start()
+    if value == b'Home':
+        new_thread = threading.Thread(target=home, name="robot_thread")
+        new_thread.start()
+    elif value == b'Left':
+        new_thread = threading.Thread(target=leftRight, name="robot_thread")
+        new_thread.start()
+    elif value == b'Blow':
+        new_thread = threading.Thread(target=blowAir, name="robot_thread")
+        new_thread.start()
     pass
 
 def main(adapter_addr):
