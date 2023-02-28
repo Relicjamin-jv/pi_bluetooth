@@ -53,7 +53,13 @@ def blowAir():
     arm.pump_off()
     # Delay 5s
     time.sleep(2)
-pass
+
+def move(x, y, z, a, b, c):
+    '''
+    Move the robot by a the defined contrains above
+    '''
+    arm.go_to_axis(x, y, z, a, b, c)
+    
 
 
 if __name__ == "__main__":
