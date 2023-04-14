@@ -10,9 +10,10 @@ from bluezero import peripheral
 
 #from wrapper
 import threading
-from robot import start_process
+from robot2 import start_process
 
 import queue
+from coin import Coin
 
 PI_SRV = '0000181c-0000-1000-8000-00805f9b34fb' # name of the service
 CMD_UUID = '00002a37-0000-1000-8000-00805f9b34fb' # name of the characteristic of that service, defined by bluetooth spec
@@ -23,9 +24,16 @@ cmd_queue = queue.Queue()
 # takes in a byte array
 def read_cmd(value, options):
     print("A command was sent")
-    command = unwrap(value)
-    print(f"Adding the robot command: {command}")
-    cmd_queue.put_nowait(command)
+    print(value)
+    command = list(value)
+    parsed_command = []
+    for i in command:
+        if i > 127:
+            parsed_command.append((256-i) * (-1))
+        else:
+            parsed_command.append(i)
+    print(f"Adding the robot command: {parsed_command}")
+    cmd_queue.put_nowait(Coin(x=parsed_command[0], y=parsed_command[1], coinSize=0))
     
 
 def unwrap(input):

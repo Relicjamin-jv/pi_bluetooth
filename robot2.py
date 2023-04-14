@@ -1,8 +1,19 @@
-import time
-from wlkata_mirobot import WlkataMirobot
+
+from wlkata_mirobot import WlkataMirobot, WlkataMirobotTool
 from time import sleep
 
-arm = None
+
+hight_z = 35 #default height when picking up blocks
+bx = 139 #defualt cooordinates for block calibration
+by = 117 #default values for block calibration 
+cx = 0 #coordiante offset
+cy = 0 #coordiante offset 
+
+
+#setting up the sorting area
+color_roi = (bx-75, by-75, 150, 150)
+
+arm = WlkataMirobot(portname="/dev/ttyUSB0") #global variable for arm
 
 def start_process(cmd_queue):
     home()
@@ -11,10 +22,50 @@ def start_process(cmd_queue):
             print("Getting next command")
             command = cmd_queue.get()
             print(f"Working on command: {command}")
-            move(command[0], command[1], command[2], command[3], command[4], command[5])
+            manipulate_coin(command)
             print(f"Finished command: {command}")
             cmd_queue.task_done() # releases the lock on the queue
 
+def manipulate_coin(coin_data):
+    y_pretranslate = coin_data.x
+    x_pretranslate = coin_data.y
+
+    x_mm, y_mm = translate(y_pretranslate, x_pretranslate)
+
+    arm.set_tool_type(WlkataMirobotTool.SUCTION_CUP)
+    
+    print(f"Moving to the coin x:{x_mm} y:{y_mm}")
+    my_go_to_axis(x=(240 - x_mm), y=(10 + y_mm), z=50)
+    sleep(2.0)
+    my_go_to_axis(x=(240 - x_mm), y=(10 + y_mm), z=8)
+    print("Suck the coin")
+    arm.pump_suction()
+    sleep(1.0)
+    my_go_to_axis(x=(240 - x_mm), y=(10 + y_mm), z=50)
+    sleep(1.0)
+    print("Move to drop off zone")
+    my_go_to_axis(x=80, y=-150, z=50)
+    print("Drop the baby")
+    arm.pump_off()
+    sleep(1.0)
+    print("Return to starting position")
+    #home()
+
+def translate(x, y):
+    if x > 0 and y > 0 or x < 0 and y < 0:
+        return y, x
+    
+    # switch the signs
+    x_s, y_s = -x, -y
+
+    # switch the values
+    x_s_positive = 1 if x_s > 0 else -1
+    y_s_positive = 1 if y_s > 0 else -1
+
+    x_new = abs(y) * x_s_positive
+    y_new = abs(x) * y_s_positive
+    
+    return x_new, y_new
 
 def home():
     # arm controls
@@ -67,11 +118,9 @@ if __name__ == "__main__":
     arm = WlkataMirobot(portname="/dev/ttyUSB0")
     home()
     print('after home, start to go to axis')
-    my_go_to_axis(y=210, x=0, z=50)
+    #my_go_to_axis(x=80, y=-200, z=200) 
+    my_go_to_axis(x = 240, y =20, z = 9) # middle is x = 225, y = 10, and z = 9
     print('before home, finish go to axis')
-   # my_go_to_axis(x=210, y=0, z=100)
-    arm.gripper_open() 
-    #my_go_to_axis(x=150, y=150, z=75)
-    arm.gripper_close()
-    #home()
+
+   
     

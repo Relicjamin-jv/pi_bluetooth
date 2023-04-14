@@ -20,7 +20,6 @@ def home():
     arm = WlkataMirobot(portname="/dev/ttyUSB0")
     arm.unlock_all_axis()
     print("Instantiate the Mirobot Arm instance")
-    arm = WlkataMirobot()
     # Mirobot Arm Multi-axis executing
     print("Homing start")
     # Note:
