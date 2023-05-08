@@ -1,6 +1,7 @@
 
 from wlkata_mirobot import WlkataMirobot, WlkataMirobotTool
 from time import sleep
+import coin
 
 
 hight_z = 35 #default height when picking up blocks
@@ -29,22 +30,30 @@ def start_process(cmd_queue):
 def manipulate_coin(coin_data):
     y_pretranslate = coin_data.x
     x_pretranslate = coin_data.y
+    coin_type = coin_data.coinSize
 
     x_mm, y_mm = translate(y_pretranslate, x_pretranslate)
 
     arm.set_tool_type(WlkataMirobotTool.SUCTION_CUP)
     
     print(f"Moving to the coin x:{x_mm} y:{y_mm}")
-    my_go_to_axis(x=(240 - x_mm), y=(10 + y_mm), z=50)
+    my_go_to_axis(x=(240 - x_mm), y=(10 + y_mm), z=75)
     sleep(2.0)
     my_go_to_axis(x=(240 - x_mm), y=(10 + y_mm), z=8)
     print("Suck the coin")
     arm.pump_suction()
     sleep(1.0)
-    my_go_to_axis(x=(240 - x_mm), y=(10 + y_mm), z=50)
+    my_go_to_axis(x=(240 - x_mm), y=(10 + y_mm), z=75)
     sleep(1.0)
     print("Move to drop off zone")
-    my_go_to_axis(x=80, y=-150, z=50)
+    if coin_type == 0:
+        my_go_to_axis(x = 175, y =-175, z = 30) #DIME
+    elif coin_type == 1:
+        my_go_to_axis(x = 120, y =-190, z = 30) # PENNY
+    elif coin_type == 2:
+        my_go_to_axis(x = 120, y =-150, z = 30) # NICKLE
+    elif coin_type == 3:
+        my_go_to_axis(x = 190, y =-140, z = 30) #QUARTER
     print("Drop the baby")
     arm.pump_off()
     sleep(1.0)
@@ -80,6 +89,7 @@ def home():
     # has_slider parameter is set to False by default
     # - If there is a slider (axis 7), set has_slider to True
     arm.home()
+    my_go_to_axis(x=120, y=-190, z=200)
     # arm.home(has_slider=False)
     # arm.home(has_slider=True)
     print("Homing finish")
@@ -119,7 +129,14 @@ if __name__ == "__main__":
     home()
     print('after home, start to go to axis')
     #my_go_to_axis(x=80, y=-200, z=200) 
-    my_go_to_axis(x = 240, y =20, z = 9) # middle is x = 225, y = 10, and z = 9
+    # penny drop zone is 120,-190, 200
+    # nickle drop zone is 220, -190, 75
+    my_go_to_axis(x = 120, y =-190, z = 30) # PENNY
+    my_go_to_axis(x = 120, y =-150, z = 30) # NICKLE
+    my_go_to_axis(x = 175, y =-175, z = 30) #DIME
+    my_go_to_axis(x = 190, y =-140, z = 30) #QUARTER
+    # middle is x = 225, y = 10, and z = 9
+    #my_go_to_axis(x = 210, y =-175, z = 75)
     print('before home, finish go to axis')
 
    

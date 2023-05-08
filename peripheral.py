@@ -33,7 +33,7 @@ def read_cmd(value, options):
         else:
             parsed_command.append(i)
     print(f"Adding the robot command: {parsed_command}")
-    cmd_queue.put_nowait(Coin(x=parsed_command[0], y=parsed_command[1], coinSize=0))
+    cmd_queue.put_nowait(Coin(x=parsed_command[0], y=parsed_command[1], coinSize=parsed_command[2]))
     
 
 def unwrap(input):
